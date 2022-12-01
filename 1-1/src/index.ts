@@ -1,0 +1,60 @@
+import * as fs from 'fs';
+import { join } from 'path';
+
+class Elf {
+    constructor(private calories: number[]) { }
+
+    public getCaloriesSum() {
+        let calories = 0;
+        this.calories.forEach((c) => calories += c);
+
+        return calories;
+    }
+}
+
+class ElfList {
+    constructor(private elfs: Elf[]) { }
+
+    public getMaxElf() {
+        const elf = this.elfs.reduce((prev, current) => prev.getCaloriesSum() > current.getCaloriesSum() ? prev : current);
+        return {
+            position: this.elfs.indexOf(elf),
+            elf,
+            calories: elf.getCaloriesSum(),
+        }
+    }
+
+    public print() {
+        let number = 0;
+        this.elfs.forEach((elf) => {
+            console.log(number + ":\t" + elf.getCaloriesSum());
+            number++;
+        });
+    }
+
+    public static getList(lines: string[]): ElfList {
+        let elfs = [];
+        let calories = [];
+
+        lines.forEach((line) => {
+            if (line.trim() === '') {
+                elfs.push(new Elf(calories));
+                calories = [];
+            } else {
+                calories.push(parseInt(line));
+            }
+        });
+
+        if (calories.length > 0) {
+            elfs.push(new Elf(calories));
+        }
+
+        return new ElfList(elfs);
+    }
+}
+
+const fileContent = fs.readFileSync(join(__dirname, './input.txt')).toString();
+const fileContentSplitByLines = fileContent.split("\n");
+
+const elfList = ElfList.getList(fileContentSplitByLines);
+console.log(`Answer: ${elfList.getMaxElf().calories}`);
