@@ -24,6 +24,14 @@ class ElfList {
         }
     }
 
+    public remove(elf: Elf) {
+        this.elfs = this.elfs.filter((e) => e !== elf);
+    }
+
+    public removeMaxElf() {
+        this.remove(this.getMaxElf().elf);
+    }
+
     public print() {
         let number = 0;
         this.elfs.forEach((elf) => {
@@ -56,5 +64,16 @@ class ElfList {
 const fileContent = fs.readFileSync(join(__dirname, './input.txt')).toString();
 const fileContentSplitByLines = fileContent.split("\n");
 
+// Part 1
 const elfList = ElfList.getList(fileContentSplitByLines);
-console.log(`Answer: ${elfList.getMaxElf().calories}`);
+console.log(`Answer part 1: ${elfList.getMaxElf().calories}`);
+
+// Add up the first 3
+let completeCalories = elfList.getMaxElf().calories;
+
+elfList.removeMaxElf();
+completeCalories += elfList.getMaxElf().calories;
+elfList.removeMaxElf();
+completeCalories += elfList.getMaxElf().calories;
+
+console.log("Answer part 2: " + completeCalories);
