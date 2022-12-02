@@ -34,6 +34,16 @@ class Translator {
             default: throw new Error('Unknown parameter ' + input.trim());
         }
     }
+
+    public revertTranslate(input: GameOption): string {
+        switch (input) {
+            case GameOption.ROCK: return 'A';
+            case GameOption.PAPER: return 'B';
+            case GameOption.SCISSORS: return 'C';
+
+            default: throw new Error('Unknown parameter ' + input);
+        }
+    }
 }
 
 class Round {
@@ -65,8 +75,12 @@ class Game {
         return score;
     }
 
-    public addRound(enemyMove: string, ownMove: string,) {
+    public addRound(enemyMove: string, ownMove: string) {
         this.rounds.push(new Round(this.translator.translate(enemyMove), this.translator.translate(ownMove)));
+    }
+
+    public getTranslator(): Translator {
+        return this.getTranslator();
     }
 }
 
@@ -85,3 +99,26 @@ fileContentSplitByLines.forEach((line) => {
 });
 
 console.log('Answer 1: ' + game.getScore());
+
+const translator = new Translator({
+    // Should fail
+    X: undefined,
+    Y: undefined,
+    Z: undefined,
+});
+const game2 = new Game(translator);
+fileContentSplitByLines.forEach((line) => {
+    const [enemyMove, matchResult] = line.split(' ');
+    let ownMove: string;
+
+    switch (matchResult.trim()) {
+        case 'X': ownMove = translator.revertTranslate(winningMap[translator.translate(enemyMove.trim())][0]); break;
+        case 'Y': ownMove = enemyMove.trim(); break; //DRAW 
+        case 'Z': ownMove = translator.revertTranslate(Object.keys(winningMap).find((key) => winningMap[key].includes(translator.translate(enemyMove.trim()))) as GameOption); break;
+    }
+
+    game2.addRound(enemyMove, ownMove);
+});
+console.log('Answer 2: ' + game2.getScore());
+
+
