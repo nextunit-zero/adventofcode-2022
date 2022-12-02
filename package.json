@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "door-1": "ts-node 2022-12-01/index.ts",
+    "door-2": "ts-node 2022-12-02/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
