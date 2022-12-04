@@ -19,6 +19,18 @@ function containsSection(sections: number[], containedSections: number[]): boole
 
     return containing;
 }
+function hasOverlappingSections(sections: number[], containedSections: number[]): boolean {
+    let containing = false;
+
+    containedSections.forEach((containedSection) => {
+        if (containing) {
+            return;
+        }
+        containing = sections.includes(containedSection);
+    });
+
+    return containing;
+}
 
 class ElfCleanup {
     constructor(public start: number, public end: number) { }
@@ -58,6 +70,10 @@ class CleanupPair {
 
         return false;
     }
+
+    public hasOverlaps(): boolean {
+        return hasOverlappingSections(this.first.getContainedSections(), this.second.getContainedSections());
+    } 
 }
 
 const pairs = [];
@@ -78,10 +94,15 @@ fileContentSplitByLines.forEach((line) => {
 
 
 let dupliactes = 0;
+let overlaps = 0;
 pairs.forEach((pair) => {
     if (pair.containsExclusivelyDoubleCleaning()) {
         dupliactes++;
     }
+    if (pair.hasOverlaps()) {
+        overlaps++;
+    }
 });
 
 console.log('Answer 1: ' + dupliactes);
+console.log('Answer 2: ' + overlaps);
