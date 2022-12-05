@@ -1,8 +1,8 @@
 import * as fs from 'fs';
 import { join } from 'path';
 
-class Ship {
-    private stacks: { [position: number]: string[] } = {};
+abstract class Ship {
+    protected stacks: { [position: number]: string[] } = {};
 
     public add(position: number, crate: string) {
         if (!this.stacks[position]) {
@@ -12,15 +12,31 @@ class Ship {
         this.stacks[position].unshift(crate);
     }
 
+    public getTopCrates(): string[] {
+        return Object.keys(this.stacks).sort((n1, n2) => parseInt(n1) - parseInt(n2))
+            .map((stackNo) => this.stacks[stackNo][this.stacks[stackNo].length - 1]);
+    }
+
+    public abstract move(crateCountToMove: number, fromStack: number, toStack: number): void;
+}
+
+class Ship9000 extends Ship {
     public move(crateCountToMove: number, fromStack: number, toStack: number) {
         for (let i = 0; i < crateCountToMove; i++) {
             this.stacks[toStack].push(this.stacks[fromStack].pop());
         }
     }
+}
 
-    public getTopCrates(): string[] {
-        return Object.keys(this.stacks).sort((n1, n2) => parseInt(n1) - parseInt(n2))
-            .map((stackNo) => this.stacks[stackNo][this.stacks[stackNo].length - 1]);
+class Ship9001 extends Ship {
+    public move(crateCountToMove: number, fromStack: number, toStack: number) {
+        const crates = [];
+        for (let i = 0; i < crateCountToMove; i++) {
+            crates.push(this.stacks[fromStack].pop());
+        }
+        while (crates.length > 0) {
+            this.stacks[toStack].push(crates.pop());
+        }
     }
 }
 
@@ -71,8 +87,14 @@ class Shiploader {
 const fileContent = fs.readFileSync(join(__dirname, './input.txt')).toString();
 const fileContentSplitByLines = fileContent.split("\n");
 
-const ship = new Ship();
+const ship = new Ship9000();
 const shipLoader = new Shiploader(ship);
 shipLoader.loadShip(fileContentSplitByLines);
 
 console.log('Answer 1:', ship.getTopCrates().join(''));
+
+const ship2 = new Ship9001();
+const shipLoader2 = new Shiploader(ship2);
+shipLoader2.loadShip(fileContentSplitByLines);
+
+console.log('Answer 2:', ship2.getTopCrates().join(''));
