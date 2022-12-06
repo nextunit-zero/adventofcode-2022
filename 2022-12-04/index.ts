@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import { join } from 'path';
-import { exit } from 'process';
 
 interface CleanupSection {
     start: number,
