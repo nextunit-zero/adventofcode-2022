@@ -60,6 +60,7 @@ class Terminal {
 
     constructor() {
         this.currentDir = this.rootDir;
+        this.currentCommand = (line: string) => { console.log('Not available', line) }
     }
 
     public input(line: string) {
@@ -118,6 +119,18 @@ class Terminal {
         }
     }
 
+    public getDirectoryWithSmallestSizeAbove(minSize: number): Directory {
+        const dirs = this.walkThrough((dir) => {
+            if (dir.getTotalSize() >= minSize) {
+                return dir;
+            }
+        });
+
+        const sorted = dirs.sort((a, b) => a.getTotalSize() - b.getTotalSize());
+
+        return sorted[0];
+    }
+
     private lsInput(line: string) {
         if (line.startsWith('dir')) {
             const [_, dir] = line.split(' ');
@@ -153,3 +166,11 @@ terminal.walkThrough((dir) => {
 });
 
 console.log('Answer 1:', sum);
+
+const leftSpace = 70000000 - terminal.getDirectory('/').getTotalSize();
+const neededSpace = 30000000 - leftSpace;
+if (neededSpace <= 0) {
+    console.log('Answer 2:', 'No additional space needed');
+} else {
+    console.log('Answer 2:', terminal.getDirectoryWithSmallestSizeAbove(neededSpace).getTotalSize());
+}
