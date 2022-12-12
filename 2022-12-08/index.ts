@@ -37,55 +37,35 @@ class TreeGrid {
     }
 
     public isVisibleFromTop(tree: Tree): boolean {
-        let currentRow = tree.getRow();
-        while (currentRow > 0) {
-            currentRow--;
-
-            if (this.getTree(tree.getColumn(), currentRow).getSize() >= tree.getSize()) {
-                return false;
-            }
-        }
-
-        return true;
+        return this.getViewFromTop(tree).visible;
     }
 
-    public isVisibleFromBottom(tree: Tree): boolean {
-        let currentRow = tree.getRow();
-        while (currentRow < this.maxRow) {
-            currentRow++;
+    public getViewCountToTop(tree: Tree): number {
+        return this.getViewFromTop(tree).view
+    }
 
-            if (this.getTree(tree.getColumn(), currentRow).getSize() >= tree.getSize()) {
-                return false;
-            }
-        }
+    public isVisibleFromBottom(tree): boolean {
+        return this.getViewFromBottom(tree).visible;
+    }
 
-        return true;
+    public getViewCountToBottom(tree: Tree): number {
+        return this.getViewFromBottom(tree).view;
     }
 
     public isVisibleFromLeft(tree: Tree): boolean {
-        let currentColumn = tree.getColumn();
-        while (currentColumn > 0) {
-            currentColumn--;
+        return this.getViewFromLeft(tree).visible;
+    }
 
-            if (this.getTree(currentColumn, tree.getRow()).getSize() >= tree.getSize()) {
-                return false;
-            }
-        }
-
-        return true;
+    public getViewCountToLeft(tree: Tree): number {
+        return this.getViewFromLeft(tree).view;
     }
 
     public isVisibleFromRight(tree: Tree): boolean {
-        let currentColumn = tree.getColumn();
-        while (currentColumn < this.maxColumn) {
-            currentColumn++;
+        return this.getViewFromRight(tree).visible;
+    }
 
-            if (this.getTree(currentColumn, tree.getRow()).getSize() >= tree.getSize()) {
-                return false;
-            }
-        }
-
-        return true;
+    public getViewCountToRight(tree: Tree): number {
+        return this.getViewFromRight(tree).view;
     }
 
     public isVisible(tree: Tree) {
@@ -122,6 +102,10 @@ class TreeGrid {
         return this.getTreeList((tree: Tree) => this.isVisible(tree));
     }
 
+    public getScenicScore(tree: Tree): number {
+        return this.getViewCountToBottom(tree) * this.getViewCountToLeft(tree) * this.getViewCountToRight(tree) * this.getViewCountToTop(tree);
+    }
+
     public static generateGrid(input: string): TreeGrid {
         const treeGrid = new TreeGrid();
         input.split("\n").forEach((line, rowIndex) => {
@@ -132,9 +116,74 @@ class TreeGrid {
 
         return treeGrid;
     }
+
+    private getViewFromTop(tree: Tree): { view: number, visible: boolean } {
+        let currentRow = tree.getRow();
+        let count = 0;
+        while (currentRow > 0) {
+            currentRow--;
+            count++;
+
+            if (this.getTree(tree.getColumn(), currentRow).getSize() >= tree.getSize()) {
+                return { view: count, visible: false };
+            }
+        }
+
+        return { view: count, visible: true };
+    }
+
+    private getViewFromBottom(tree: Tree): { view: number, visible: boolean } {
+        let currentRow = tree.getRow();
+        let count = 0;
+        while (currentRow < this.maxRow) {
+            currentRow++;
+            count++;
+
+            if (this.getTree(tree.getColumn(), currentRow).getSize() >= tree.getSize()) {
+                return { view: count, visible: false };
+            }
+        }
+        return { view: count, visible: true };
+    }
+
+    private getViewFromLeft(tree: Tree): { view: number, visible: boolean } {
+        let currentColumn = tree.getColumn();
+        let count = 0;
+        while (currentColumn > 0) {
+            currentColumn--;
+            count++;
+
+            if (this.getTree(currentColumn, tree.getRow()).getSize() >= tree.getSize()) {
+                return { view: count, visible: false };
+            }
+        }
+
+        return { view: count, visible: true };
+    }
+
+    private getViewFromRight(tree: Tree): { view: number, visible: boolean } {
+        let currentColumn = tree.getColumn();
+        let count = 0;
+        while (currentColumn < this.maxColumn) {
+            currentColumn++;
+            count++;
+
+            if (this.getTree(currentColumn, tree.getRow()).getSize() >= tree.getSize()) {
+                return { view: count, visible: false };
+            }
+        }
+
+        return { view: count, visible: true };
+    }
+
 }
 
 const fileContent = fs.readFileSync(join(__dirname, './input.txt')).toString();
 const grid = TreeGrid.generateGrid(fileContent);
 
 console.log('Answer 1: :', grid.getVisibleTrees().length);
+
+let max = 0;
+grid.getTreeList().forEach((tree) => max = grid.getScenicScore(tree) > max ? grid.getScenicScore(tree) : max);
+
+console.log('Answer 2: :', max);
