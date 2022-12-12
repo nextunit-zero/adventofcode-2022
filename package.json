@@ -12,6 +12,7 @@
     "door-6": "ts-node 2022-12-06/index.ts",
     "door-7": "ts-node 2022-12-07/index.ts",
     "door-8": "ts-node 2022-12-08/index.ts",
+    "door-9": "ts-node 2022-12-09/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
